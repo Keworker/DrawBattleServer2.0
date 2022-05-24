@@ -86,7 +86,7 @@ public abstract class Room {
         public void run() {
             try {
                 //sleep(90000);
-                sleep(90010);
+                sleep(90100);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();

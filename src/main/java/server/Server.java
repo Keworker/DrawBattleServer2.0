@@ -6,6 +6,7 @@ import classes.rooms.Room;
 import classes.User;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class Server {
         public void run() {
             try {
                 Scanner in = new Scanner(user.getSocket().getInputStream());
-                main: while (true) {
+                while (true) {
                     if (in.hasNext()) {
                         String[] message = in.nextLine().split("/");
                         for (String ss : message) {
@@ -88,32 +89,28 @@ public class Server {
                         System.out.print("\n");
                         try {
                             switch (message[0]) {
+                                case "serv": {
+                                    return;
+                                }
                                 case "init": {
-                                    if (!user.isInit()) {
-                                        user.setName(message[2]);
-                                        users.add(user);
-                                        toRoom(user, Integer.parseInt(message[1]));
-                                        user.getPrintWriter().println("init/200/" + user.getId() + "/");
-                                        user.getPrintWriter().flush();
-                                        String s = "";
-                                        for (User u : user.getRoom().getMembers()) {
-                                            s += u.getName() + ";";
-                                            u.getPrintWriter().println("new/" + user.getName());
-                                            u.getPrintWriter().flush();
-                                        }
-                                        user.getPrintWriter().println(s);
-                                        user.getPrintWriter().flush();
-                                        System.out.print(logStart);
-                                        for (Room room : rooms) {
-                                            System.out.println(room.toString());
-                                        }
-                                        user.setInit();
+                                    user.setName(message[2]);
+                                    users.add(user);
+                                    toRoom(user, Integer.parseInt(message[1]));
+                                    user.getPrintWriter().println("init/200/" + user.getId() + "/");
+                                    user.getPrintWriter().flush();
+                                    String s = "";
+                                    for (User u : user.getRoom().getMembers()) {
+                                        s += u.getName() + ";";
+                                        u.getPrintWriter().println("new/" + user.getName());
+                                        u.getPrintWriter().flush();
                                     }
-                                    else {
-                                        System.out.println("User: " + user.getId() + ". Bad request.");
-                                        user.getPrintWriter().println("init/403/Already init");
-                                        user.getPrintWriter().flush();
+                                    user.getPrintWriter().println(s);
+                                    user.getPrintWriter().flush();
+                                    System.out.print(logStart);
+                                    for (Room room : rooms) {
+                                        System.out.println(room.toString());
                                     }
+                                    user.setInit();
                                     break;
                                 }
                                 case "run": {
@@ -127,9 +124,10 @@ public class Server {
                                                 for (User u : user.getRoom().getMembers()) {
                                                     u.getPrintWriter().println("request/run/" + q);
                                                     u.getPrintWriter().flush();
+//                                                    u.getPrintWriter().println("serv/");
+//                                                    u.getPrintWriter().flush();
                                                 }
                                                 user.getRoom().run();
-                                                return;
                                                 //Удалить всех юзеров с основново сервера
                                             }
                                             else {
